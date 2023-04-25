@@ -25,6 +25,8 @@ type=lvm
 EOF
 
 read -rd '' _startup_runner_script << EOF || true
+
+# Run the post OS-install setup if the flag file exists
 if [ -f ~/$POST_INSTALL_NAME ]; then
     ~/$SELF_NAME
 fi
