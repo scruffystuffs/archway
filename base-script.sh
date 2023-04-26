@@ -63,9 +63,6 @@ execute_pre_boot() {
     do_boot_setup
     touch $MOUNT_PREFIX/home/$INIT_USER/$POST_INSTALL_NAME
     umount -a
-    systemctl -i reboot
-    echo sleeping to trigger reboot
-    sleep 20
 }
 
 do_disk_setup() {
