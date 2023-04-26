@@ -35,7 +35,9 @@ fi
 EOF
 
 read -rsp "Enter the new root password:" _root_passwd
+echo
 read -rsp "Enter the new password for user '$INIT_USER':" _user_passwd
+echo
 
 # HELPERS
 
@@ -60,7 +62,7 @@ execute_pre_boot() {
     do_boot_setup
     touch $MOUNT_PREFIX/home/$INIT_USER/$POST_INSTALL_NAME
     umount -a
-    systemctl reboot -i
+    systemctl -i reboot
 }
 
 do_disk_setup() {
@@ -105,7 +107,7 @@ format_boot_partition() {
 }
 
 setup_lvm_partition() {
-    pvcreate --dataalignment 1m $LVM_PARTITION
+    pvcreate --dataalignment 1m $DEVICE
     vgcreate vg0 $LVM_PARTITION
     lvcreate -L 30GB vg0 -n lv_root
     lvcreate -l 100%FREE vg0 -n lv_home
@@ -212,7 +214,7 @@ update_sudoers() {
 }
 
 mount_efi_volume() {
-    ch mount --mkdir "${DEVICE}1" /boot/EFI
+    ch mount --mkdir "$BOOT_PARTITION" /boot/EFI
 }
 
 install_bootloader() {
