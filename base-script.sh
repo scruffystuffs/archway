@@ -81,8 +81,7 @@ do_boot_setup() {
     setup_locale
     add_boot_hooks
     generate_initrd
-    set_root_passwd
-    mk_init_user
+    user_updates
     update_sudoers
     mount_efi_volume
     install_bootloader
@@ -197,15 +196,9 @@ generate_initrd() {
     ch mkinitcpio -p linux -p linux-lts
 }
 
-set_root_passwd() {
-    # echo "Enter the new root password"
-    ch echo "$_root_passwd" | passwd --stdin
-}
-
-mk_init_user() {
+user_updates() {
     ch useradd -mG wheel $INIT_USER
-    # echo "Enter the new password for $INIT_USER"
-    ch echo "$_user_passwd" | passwd --stdin $INIT_USER
+    ch echo "root:${_root_passwd}\n${INIT_USER}:${_user_passwd}" | chpasswd
 }
 
 update_sudoers() {
