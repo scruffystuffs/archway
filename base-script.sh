@@ -57,7 +57,7 @@ execute_pre_boot() {
     do_boot_setup
     touch $MOUNT_PREFIX/home/$INIT_USER/$POST_INSTALL_NAME
     umount -a
-    reboot
+    systemctl reboot -i
 }
 
 do_disk_setup() {
