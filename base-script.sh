@@ -170,7 +170,22 @@ setup_locale() {
 }
 
 add_boot_hooks() {
-    add-boot-hooks.py -l $MOUNT_PREFIX/etc/mkinitcpio.conf
+    eval "$(cat $MOUNT_PREFIX/etc/mkinitcpio.conf | grep HOOKS)"
+    needle=block
+    idx=-1
+
+    for i in "${!HOOKS[@]}"; do
+        if [ "${HOOKS[$i]}" = "${needle}" ]; then
+            idx=$((i+1))
+        fi
+    done
+
+    if [ "${idx}" = "-1" ]; then
+        echo 'Failed to add build hook, could not find "block" hook'
+        exit 1
+    fi
+    new_hooks=("${HOOKS[@]:0:$idx}" "lvm2" "${HOOKS[@]:idx}")
+    echo "HOOKS=(" "${new_hooks[@]}" ")" > $MOUNT_PREFIX/etc/mkinitcpio.conf
 }
 
 generate_initrd() {
