@@ -131,7 +131,7 @@ bootstrap_pacman() {
 }
 
 install_initial_packages() {
-    ch pacman -S \
+    ch pacman -S --noconfirm \
         linux \
         linux-headers \
         linux-lts \
@@ -246,7 +246,7 @@ set_hostname() {
 }
 
 post_installs() {
-    pacman -S \
+    pacman -S --noconfirm \
         amd-ucode \
         xorg-server \
         virtualbox-guest-utils \
