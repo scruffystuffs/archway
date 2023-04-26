@@ -261,3 +261,5 @@ post_installs() {
 remove_autorun() {
     rm ~/$POST_INSTALL_NAME ~/$SELF_NAME
 }
+
+execute
