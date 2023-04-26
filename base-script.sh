@@ -198,7 +198,7 @@ set_root_passwd() {
 }
 
 mk_init_user() {
-    ch adduser -mG wheel
+    ch useradd -mG wheel $INIT_USER
     echo "Enter the new password for $INIT_USER"
     ch passwd $INIT_USER
 }
@@ -214,16 +214,16 @@ update_sudoers() {
 }
 
 mount_efi_volume() {
-    mount --mkdir /dev/sda1 $MOUNT_PREFIX/boot/EFI
+    ch mount --mkdir "${DEVICE}1" /boot/EFI
 }
 
 install_bootloader() {
-    grub-install --target=x86_64-efi --bootloader-id=grub_uefi --recheck
+    ch grub-install --target=x86_64-efi --bootloader-id=grub_uefi --recheck
     mkdir -p $MOUNT_PREFIX/boot/grub/locale
     cp $MOUNT_PREFIX/usr/share/locale/en\@quot/LC_MESSAGES/grub.mo $MOUNT_PREFIX/boot/grub/locale/en.mo
     cp $MOUNT_PREFIX/etc/default/grub $MOUNT_PREFIX/etc/default/grub.bak
-    echo 'GRUB_DEFAULT=saved' >>$MOUNT_PREFIX/etc/defult/grub
-    echo 'GRUB_SAVEDEFAULT=true' >>$MOUNT_PREFIX/etc/defult/grub
+    echo 'GRUB_DEFAULT=saved' >>$MOUNT_PREFIX/etc/default/grub
+    echo 'GRUB_SAVEDEFAULT=true' >>$MOUNT_PREFIX/etc/default/grub
     ch grub-mkconfig -o /boot/grub/grub.cfg
 }
 
