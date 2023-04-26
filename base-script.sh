@@ -62,7 +62,8 @@ execute_pre_boot() {
     do_distro_install
     do_boot_setup
     touch $MOUNT_PREFIX/home/$INIT_USER/$POST_INSTALL_NAME
-    umount -a
+    umount -av
+    systemctl -i reboot
 }
 
 do_disk_setup() {
