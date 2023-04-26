@@ -5,8 +5,8 @@ set -euo pipefail
 DEVICE=/dev/sda
 BOOT_PARTITION="${DEVICE}1"
 LVM_PARTITION="${DEVICE}2"
-ROOT_FS=/dev/volgroup0/lv_root
-HOME_FS=/dev/volgroup0/lv_home
+ROOT_FS=/dev/vg0/lv_root
+HOME_FS=/dev/vg0/lv_home
 POST_INSTALL_NAME=".run_postinstall"
 LOCALE_GEN="en_US.UTF-8 UTF-8"
 MOUNT_PREFIX="/mnt/newsys"
@@ -104,9 +104,9 @@ format_boot_partition() {
 
 setup_lvm_partition() {
     pvcreate --dataalignment 1m $LVM_PARTITION
-    vgcreate volgroup0 $LVM_PARTITION
-    lvcreate -L 30GB volgroup0 -n lv_root
-    lvcreate -l 100%FREE volgroup0 -n lv_home
+    vgcreate vg0 $LVM_PARTITION
+    lvcreate -L 30GB vg0 -n lv_root
+    lvcreate -l 100%FREE vg0 -n lv_home
     modprobe dm_mod
     vgscan
     vgchange -ay
