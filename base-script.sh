@@ -17,14 +17,14 @@ SELF_NAME="archway.sh"
 # Read will return 1 if EOF is hit, which it always is when using -d ''.
 # We have to ignore failure on those cases because of -e in the shebang.
 
-read -rd '' _sfdisk_script << 'EOF' || true
+read -rd '' _sfdisk_script <<'EOF' || true
 label: gpt
 
 size=+500MiB, type=uefi
 type=lvm
 EOF
 
-read -rd '' _startup_runner_script << EOF || true
+read -rd '' _startup_runner_script <<EOF || true
 
 # Run the post OS-install setup if the flag file exists
 if [ -f ~/$POST_INSTALL_NAME ]; then
@@ -159,7 +159,7 @@ enable_startup_services() {
 
 setup_locale() {
     # Ensure that we're using a valid locale
-    if ! grep -q $LOCALE_GEN $MOUNT_PREFIX/etc/locale.gen; then
+    if ! grep -q "$LOCALE_GEN" $MOUNT_PREFIX/etc/locale.gen; then
         echo "ERROR: invalid locale:" "$LOCALE_GEN"
         exit 1
     fi
@@ -176,7 +176,7 @@ add_boot_hooks() {
 
     for i in "${!HOOKS[@]}"; do
         if [ "${HOOKS[$i]}" = "${needle}" ]; then
-            idx=$((i+1))
+            idx=$((i + 1))
         fi
     done
 
@@ -185,7 +185,7 @@ add_boot_hooks() {
         exit 1
     fi
     new_hooks=("${HOOKS[@]:0:$idx}" "lvm2" "${HOOKS[@]:idx}")
-    echo "HOOKS=(" "${new_hooks[@]}" ")" > $MOUNT_PREFIX/etc/mkinitcpio.conf
+    echo "HOOKS=(" "${new_hooks[@]}" ")" >$MOUNT_PREFIX/etc/mkinitcpio.conf
 }
 
 generate_initrd() {
@@ -204,7 +204,7 @@ mk_init_user() {
 }
 
 update_sudoers() {
-    echo '%wheel ALL=(ALL:ALL) NOPASSWD: ALL' >> $MOUNT_PREFIX/etc/sudoers.d/wheel
+    echo '%wheel ALL=(ALL:ALL) NOPASSWD: ALL' >>$MOUNT_PREFIX/etc/sudoers.d/wheel
     chmod 440 $MOUNT_PREFIX/etc/sudoers.d/wheel
     # Use visudo to check the format is correct
     if ! visudo -c; then
@@ -222,13 +222,13 @@ install_bootloader() {
     mkdir -p $MOUNT_PREFIX/boot/grub/locale
     cp $MOUNT_PREFIX/usr/share/locale/en\@quot/LC_MESSAGES/grub.mo $MOUNT_PREFIX/boot/grub/locale/en.mo
     cp $MOUNT_PREFIX/etc/default/grub $MOUNT_PREFIX/etc/default/grub.bak
-    echo 'GRUB_DEFAULT=saved' >> $MOUNT_PREFIX/etc/defult/grub
-    echo 'GRUB_SAVEDEFAULT=true' >> $MOUNT_PREFIX/etc/defult/grub
+    echo 'GRUB_DEFAULT=saved' >>$MOUNT_PREFIX/etc/defult/grub
+    echo 'GRUB_SAVEDEFAULT=true' >>$MOUNT_PREFIX/etc/defult/grub
     ch grub-mkconfig -o /boot/grub/grub.cfg
 }
 
 install_startup_runner() {
-    echo "$_startup_runner_script" >> $MOUNT_PREFIX/home/$INIT_USER/.profile
+    echo "$_startup_runner_script" >>$MOUNT_PREFIX/home/$INIT_USER/.profile
     touch ~/$POST_INSTALL_NAME
     cp "$0" "$MOUNT_PREFIX/home/$INIT_USER/$SELF_NAME"
     chmod a+x "$MOUNT_PREFIX/home/$INIT_USER/$SELF_NAME"
@@ -241,8 +241,8 @@ set_timezone() {
 
 set_hostname() {
     hostnamectl set-hostname $HOSTNAME
-    echo '127.0.0.1 localhost' >> /etc/hosts
-    echo "127.0.1.1 $HOSTNAME" >> /etc/hosts
+    echo '127.0.0.1 localhost' >>/etc/hosts
+    echo "127.0.1.1 $HOSTNAME" >>/etc/hosts
 }
 
 post_installs() {
