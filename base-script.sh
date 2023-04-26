@@ -34,6 +34,9 @@ if [ -f ~/$POST_INSTALL_NAME ]; then
 fi
 EOF
 
+read -rp "Enter the new root password:" _root_passwd
+read -rp "Enter the new password for user '$INIT_USER':" _user_passwd
+
 # HELPERS
 
 ch() {
@@ -195,14 +198,14 @@ generate_initrd() {
 }
 
 set_root_passwd() {
-    echo "Enter the new root password"
-    ch passwd
+    # echo "Enter the new root password"
+    ch echo "$_root_passwd" | passwd --stdin
 }
 
 mk_init_user() {
     ch useradd -mG wheel $INIT_USER
-    echo "Enter the new password for $INIT_USER"
-    ch passwd $INIT_USER
+    # echo "Enter the new password for $INIT_USER"
+    ch echo "$_user_passwd" | passwd --stdin $INIT_USER
 }
 
 update_sudoers() {
