@@ -1,4 +1,6 @@
-#! /bin/bash -eu
+#! /bin/bash
+
+set -euo pipefail
 
 DEVICE=/dev/sda
 BOOT_PARTITION="${DEVICE}1"
