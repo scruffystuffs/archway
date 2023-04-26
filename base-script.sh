@@ -107,7 +107,7 @@ format_boot_partition() {
 }
 
 setup_lvm_partition() {
-    pvcreate --dataalignment 1m $DEVICE
+    pvcreate --dataalignment 1m $LVM_PARTITION
     vgcreate vg0 $LVM_PARTITION
     lvcreate -L 30GB vg0 -n lv_root
     lvcreate -l 100%FREE vg0 -n lv_home
