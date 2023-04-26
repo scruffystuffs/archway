@@ -3,4 +3,5 @@
 Quickstart:
 
 ```bash
-curl -SsL | tee archway.sh | bash -s
+curl -SsL https://raw.githubusercontent.com/scruffystuffs/archway/main/base_script.sh > archway.sh && bash archway.sh
+```
