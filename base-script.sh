@@ -34,8 +34,8 @@ if [ -f ~/$POST_INSTALL_NAME ]; then
 fi
 EOF
 
-read -rp "Enter the new root password:" _root_passwd
-read -rp "Enter the new password for user '$INIT_USER':" _user_passwd
+read -rsp "Enter the new root password:" _root_passwd
+read -rsp "Enter the new password for user '$INIT_USER':" _user_passwd
 
 # HELPERS
 
