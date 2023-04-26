@@ -5,8 +5,9 @@ set -euo pipefail
 DEVICE=/dev/sda
 BOOT_PARTITION="${DEVICE}1"
 LVM_PARTITION="${DEVICE}2"
-ROOT_FS=/dev/vg0/lv_root
-HOME_FS=/dev/vg0/lv_home
+VOLGROUP_NAME=vg0
+ROOT_FS=/dev/$VOLGROUP_NAME/lv_root
+HOME_FS=/dev/$VOLGROUP_NAME/lv_home
 POST_INSTALL_NAME=".run_postinstall"
 LOCALE_GEN="en_US.UTF-8 UTF-8"
 MOUNT_PREFIX="/mnt/newsys"
@@ -62,7 +63,7 @@ execute_pre_boot() {
     do_distro_install
     do_boot_setup
     touch $MOUNT_PREFIX/home/$INIT_USER/$POST_INSTALL_NAME
-    umount -av
+    # umount -av
     systemctl -i reboot
 }
 
@@ -109,9 +110,9 @@ format_boot_partition() {
 
 setup_lvm_partition() {
     pvcreate --dataalignment 1m $LVM_PARTITION
-    vgcreate vg0 $LVM_PARTITION
-    lvcreate -L 30GB vg0 -n lv_root
-    lvcreate -l 100%FREE vg0 -n lv_home
+    vgcreate $VOLGROUP_NAME $LVM_PARTITION
+    lvcreate -L 30GB $VOLGROUP_NAME -n lv_root
+    lvcreate -l 100%FREE $VOLGROUP_NAME -n lv_home
     modprobe dm_mod
     vgscan
     vgchange -ay
