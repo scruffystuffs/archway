@@ -30,7 +30,8 @@ read -rd '' _startup_runner_script <<EOF || true
 
 # Run the post OS-install setup if the flag file exists
 if [ -f ~/$POST_INSTALL_NAME ]; then
-    ~/$SELF_NAME
+    # We don't want to source this file
+    bash ~/$SELF_NAME
 fi
 EOF
 
@@ -63,6 +64,7 @@ execute_pre_boot() {
     touch $MOUNT_PREFIX/home/$INIT_USER/$POST_INSTALL_NAME
     umount -a
     systemctl -i reboot
+    sleep 2
 }
 
 do_disk_setup() {
