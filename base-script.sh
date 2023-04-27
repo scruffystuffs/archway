@@ -21,14 +21,14 @@ SELF_NAME="archway.sh"
 # Read will return 1 if EOF is hit, which it always is when using -d ''.
 # We have to ignore failure on those cases because of -e in the shebang.
 
-read -rd '' _sfdisk_script <<'EOF' || true
+read -rd '' sfdisk_script <<'EOF' || true
 label: gpt
 
 size=+500MiB, type=uefi
 type=lvm
 EOF
 
-read -rd '' _startup_runner_script <<EOF || true
+read -rd '' startup_runner_script <<EOF || true
 
 # Run the post OS-install setup if the flag file exists
 if [ -f ~/$POST_INSTALL_NAME ]; then
@@ -37,9 +37,9 @@ if [ -f ~/$POST_INSTALL_NAME ]; then
 fi
 EOF
 
-read -rsp "Enter the new root password:" _root_passwd
+read -rsp "Enter the new root password:" root_passwd
 echo
-read -rsp "Enter the new password for user '$INIT_USER':" _user_passwd
+read -rsp "Enter the new password for user '$INIT_USER':" user_passwd
 echo
 
 # HELPERS
@@ -102,7 +102,7 @@ execute_post_boot() {
 }
 
 create_base_partitions() {
-    echo "$_sfdisk_script" | sfdisk $DEVICE
+    echo "$sfdisk_script" | sfdisk $DEVICE
 }
 
 format_boot_partition() {
@@ -204,6 +204,11 @@ generate_initrd() {
 
 user_updates() {
     ch useradd -mG wheel $INIT_USER
+    # printf will actually make newlines work
+    ch printf "root:${root_passwd}\n${INIT_USER}:${user_passwd}" | chpasswd
+    check_password root "$root_passwd" $MOUNT_PREFIX/etc/shadow
+    check_password kate "$user_passwd" $MOUNT_PREFIX/etc/shadow
+}
 
 check_password() {
     local username="$1"
@@ -266,7 +271,7 @@ install_bootloader() {
 }
 
 install_startup_runner() {
-    echo "$_startup_runner_script" >>$MOUNT_PREFIX/home/$INIT_USER/.profile
+    echo "$startup_runner_script" >>$MOUNT_PREFIX/home/$INIT_USER/.profile
     touch ~/$POST_INSTALL_NAME
     cp "$0" "$MOUNT_PREFIX/home/$INIT_USER/$SELF_NAME"
     chmod a+x "$MOUNT_PREFIX/home/$INIT_USER/$SELF_NAME"
