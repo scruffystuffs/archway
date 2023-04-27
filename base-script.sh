@@ -37,7 +37,7 @@ ch() {
 # BUSINESS LOGIC
 
 execute() {
-    if [ -f ~/$POST_INSTALL_NAME ]; then
+    if [ -f $POST_INSTALL_NAME ]; then
         execute_post_boot
     else
         execute_pre_boot
@@ -50,7 +50,6 @@ execute_pre_boot() {
     do_distro_install
     do_boot_setup
     touch $MOUNT_PREFIX/home/$INIT_USER/$POST_INSTALL_NAME
-    # umount -av
     systemctl -i reboot
 }
 
