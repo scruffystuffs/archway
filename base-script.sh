@@ -49,7 +49,6 @@ execute_pre_boot() {
     do_disk_setup
     do_distro_install
     do_boot_setup
-    touch $MOUNT_PREFIX/home/$INIT_USER/$POST_INSTALL_NAME
     systemctl -i reboot
 }
 
@@ -261,7 +260,7 @@ install_bootloader() {
 }
 
 install_startup_runner() {
-    touch ~/$POST_INSTALL_NAME
+    touch "$MOUNT_PREFIX/root/$POST_INSTALL_NAME"
     cp "$0" "$MOUNT_PREFIX/root/$SELF_NAME"
     chmod a+x "$MOUNT_PREFIX/root/$SELF_NAME"
 }
