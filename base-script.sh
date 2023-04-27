@@ -46,6 +46,10 @@ execute() {
 
 execute_pre_boot() {
     echo executing pre-boot steps
+    read -rsp "Enter the new root password:" root_passwd
+    echo
+    read -rsp "Enter the new password for user '$INIT_USER':" user_passwd
+    echo
     do_disk_setup
     do_distro_install
     do_boot_setup
@@ -188,10 +192,6 @@ generate_initrd() {
 }
 
 user_updates() {
-    read -rsp "Enter the new root password:" root_passwd
-    echo
-    read -rsp "Enter the new password for user '$INIT_USER':" user_passwd
-    echo
     ch useradd -mG wheel $INIT_USER
     printf "root:%s\n%s:%s" "$root_passwd" "$INIT_USER" "$user_passwd" | chpasswd -R $MOUNT_PREFIX
     pacman -Sy --noconfirm whois
