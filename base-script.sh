@@ -204,8 +204,7 @@ generate_initrd() {
 
 user_updates() {
     ch useradd -mG wheel $INIT_USER
-    # shellcheck disable=SC2016 # We need to pass this whole string to ch
-    ch 'printf "root:%s\n%s:%s" "$root_passwd" "$INIT_USER" "$user_passwd" | chpasswd'
+    printf "root:%s\n%s:%s" "$root_passwd" "$INIT_USER" "$user_passwd" | chpasswd -R $MOUNT_PREFIX
     check_password root "$root_passwd" $MOUNT_PREFIX/etc/shadow
     check_password kate "$user_passwd" $MOUNT_PREFIX/etc/shadow
 }
