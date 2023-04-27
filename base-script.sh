@@ -81,6 +81,7 @@ do_boot_setup() {
 
 execute_post_boot() {
     echo executing post-boot steps
+    check_root
     set_timezone
     set_hostname
     post_installs
@@ -262,8 +263,17 @@ install_bootloader() {
 
 install_startup_runner() {
     touch ~/$POST_INSTALL_NAME
-    cp "$0" "$MOUNT_PREFIX/home/$INIT_USER/$SELF_NAME"
-    chmod a+x "$MOUNT_PREFIX/home/$INIT_USER/$SELF_NAME"
+    cp "$0" "$MOUNT_PREFIX/root/$SELF_NAME"
+    chmod a+x "$MOUNT_PREFIX/root/$SELF_NAME"
+}
+
+check_root() {
+    if [ "$(id -u)" -eq 0 ]; then
+        pushd /root
+    else
+        echo 'Must be run as root'
+        exit 1
+    fi
 }
 
 set_timezone() {
@@ -291,7 +301,8 @@ post_installs() {
 }
 
 remove_autorun() {
-    rm ~/$POST_INSTALL_NAME ~/$SELF_NAME
+    rm $POST_INSTALL_NAME $SELF_NAME
+    popd
 }
 
 execute
