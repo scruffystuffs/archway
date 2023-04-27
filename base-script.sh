@@ -291,7 +291,6 @@ post_installs() {
 
 remove_autorun() {
     sudo rm $POST_INSTALL_NAME $SELF_NAME
-    popd
 }
 
 execute
