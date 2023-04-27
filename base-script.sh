@@ -83,11 +83,11 @@ do_boot_setup() {
 
 execute_post_boot() {
     echo executing post-boot steps
-    check_root
     set_timezone
     set_hostname
     post_installs
     remove_autorun
+    reboot
 }
 
 create_base_partitions() {
@@ -260,33 +260,24 @@ install_bootloader() {
 }
 
 install_startup_runner() {
-    touch "$MOUNT_PREFIX/root/$POST_INSTALL_NAME"
-    cp "$0" "$MOUNT_PREFIX/root/$SELF_NAME"
-    chmod a+x "$MOUNT_PREFIX/root/$SELF_NAME"
-}
-
-check_root() {
-    if [ "$(id -u)" -eq 0 ]; then
-        pushd /root
-    else
-        echo 'Must be run as root'
-        exit 1
-    fi
+    touch "$MOUNT_PREFIX/home/$INIT_USER/$POST_INSTALL_NAME"
+    cp "$0" "$MOUNT_PREFIX/home/$INIT_USER/$SELF_NAME"
+    chmod a+x "$MOUNT_PREFIX/home/$INIT_USER/$SELF_NAME"
 }
 
 set_timezone() {
-    timedatectl set-timezone $TIMEZONE
-    timedatectl set-ntp true
+    sudo timedatectl set-timezone $TIMEZONE
+    sudo timedatectl set-ntp true
 }
 
 set_hostname() {
-    hostnamectl set-hostname $HOSTNAME
-    echo '127.0.0.1 localhost' >>/etc/hosts
-    echo "127.0.1.1 $HOSTNAME" >>/etc/hosts
+    sudo hostnamectl set-hostname $HOSTNAME
+    echo '127.0.0.1 localhost' | sudo tee -a /etc/hosts
+    echo "127.0.1.1 $HOSTNAME" | sudo tee -a /etc/hosts
 }
 
 post_installs() {
-    pacman -S --noconfirm \
+    sudo pacman -S --noconfirm \
         amd-ucode \
         xorg-server \
         virtualbox-guest-utils \
@@ -295,11 +286,11 @@ post_installs() {
         xfce4-goodies \
         lightdm \
         lightdm-gtk-greeter
-    systemctl enable vboxservice lightdm
+    sudo systemctl enable vboxservice lightdm
 }
 
 remove_autorun() {
-    rm $POST_INSTALL_NAME $SELF_NAME
+    sudo rm $POST_INSTALL_NAME $SELF_NAME
     popd
 }
 
