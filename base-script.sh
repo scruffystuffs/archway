@@ -33,14 +33,9 @@ read -rd '' startup_runner_script <<EOF || true
 # Run the post OS-install setup if the flag file exists
 if [ -f ~/$POST_INSTALL_NAME ]; then
     # We don't want to source this file
-    bash ~/$SELF_NAME
+    sudo bash \$HOME/$SELF_NAME
 fi
 EOF
-
-read -rsp "Enter the new root password:" root_passwd
-echo
-read -rsp "Enter the new password for user '$INIT_USER':" user_passwd
-echo
 
 # HELPERS
 
@@ -203,6 +198,10 @@ generate_initrd() {
 }
 
 user_updates() {
+    read -rsp "Enter the new root password:" root_passwd
+    echo
+    read -rsp "Enter the new password for user '$INIT_USER':" user_passwd
+    echo
     ch useradd -mG wheel $INIT_USER
     printf "root:%s\n%s:%s" "$root_passwd" "$INIT_USER" "$user_passwd" | chpasswd -R $MOUNT_PREFIX
     pacman -Sy whois
