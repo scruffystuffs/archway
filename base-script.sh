@@ -28,15 +28,6 @@ size=+500MiB, type=uefi
 type=lvm
 EOF
 
-read -rd '' startup_runner_script <<EOF || true
-
-# Run the post OS-install setup if the flag file exists
-if [ -f ~/$POST_INSTALL_NAME ]; then
-    # We don't want to source this file
-    sudo bash \$HOME/$SELF_NAME
-fi
-EOF
-
 # HELPERS
 
 ch() {
@@ -270,7 +261,6 @@ install_bootloader() {
 }
 
 install_startup_runner() {
-    echo "$startup_runner_script" >>$MOUNT_PREFIX/home/$INIT_USER/.profile
     touch ~/$POST_INSTALL_NAME
     cp "$0" "$MOUNT_PREFIX/home/$INIT_USER/$SELF_NAME"
     chmod a+x "$MOUNT_PREFIX/home/$INIT_USER/$SELF_NAME"
