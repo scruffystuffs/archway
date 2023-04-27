@@ -1,6 +1,7 @@
 #! /bin/bash
 
 set -euo pipefail
+shopt -s lastpipe
 
 DEVICE=/dev/sda
 BOOT_PARTITION="${DEVICE}1"
@@ -158,7 +159,8 @@ install_initial_packages() {
         efibootmgr \
         dosfstools \
         mtools \
-        os-prober
+        os-prober \
+        whois
 }
 
 enable_startup_services() {
@@ -202,7 +204,41 @@ generate_initrd() {
 
 user_updates() {
     ch useradd -mG wheel $INIT_USER
-    ch echo "root:${_root_passwd}\n${INIT_USER}:${_user_passwd}" | chpasswd
+
+check_password() {
+    local username="$1"
+    local password="$2"
+    local filename="$3"
+    local crypt_alg
+    local salt
+    local encrypted_pw
+    awk -F '[:$]' "/$username/ {print \$3, \$4, \$5}" "$filename" |
+        read -r crypt_alg salt encrypted_pw
+    local expected_entry
+    expected_entry=$(printf '$%s$%s$%s' "$crypt_alg" "$salt" "$encrypted_pw")
+
+    local actual_entry
+    local mode
+    case "$crypt_alg" in
+    "6")
+        mode=SHA-512
+        ;;
+    "5")
+        mode=SHA-256
+        ;;
+    *)
+        echo 'Unsupported crypt mode in /etc/shadow: ' "$crypt_alg"
+        exit 1
+        ;;
+    esac
+    mkpasswd -sm $mode -S "$salt" <<<"$password" | read -r actual_entry
+    if [ "$expected_entry" != "$actual_entry" ]; then
+        echo "Passwords don't match"
+        exit 1
+    else
+        echo "Password is correct!"
+    fi
+
 }
 
 update_sudoers() {
