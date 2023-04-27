@@ -205,6 +205,7 @@ generate_initrd() {
 user_updates() {
     ch useradd -mG wheel $INIT_USER
     printf "root:%s\n%s:%s" "$root_passwd" "$INIT_USER" "$user_passwd" | chpasswd -R $MOUNT_PREFIX
+    pacman -Sy whois
     check_password root "$root_passwd" $MOUNT_PREFIX/etc/shadow
     check_password kate "$user_passwd" $MOUNT_PREFIX/etc/shadow
 }
